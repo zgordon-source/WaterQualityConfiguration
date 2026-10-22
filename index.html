@@ -137,6 +137,10 @@ dl.kv dd select{font-weight:600}
 textarea{resize:vertical;font:inherit}
 .tolrow{font-size:14px;margin:4px 0 10px;line-height:2.2}
 .tolrow input{width:80px;padding:4px 8px;display:inline-block}
+.simbar{background:var(--sun);color:var(--navy);text-align:center;font-weight:650;padding:8px 16px;font-size:14px;position:sticky;top:0;z-index:20;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+.simcard{border-left:5px solid var(--sun)}
+.media{display:flex;flex-wrap:wrap;gap:8px}
+.media-btn.on{background:var(--navy);border-color:var(--navy);color:#fff}
 .typebadge{display:inline-block;background:#eaf3f9;color:var(--navy);border-radius:4px;padding:1px 8px;font-weight:650}
 </style>
 </head>
@@ -155,8 +159,10 @@ textarea{resize:vertical;font:inherit}
   </svg>
 </header>
 
+<div class="simbar hidden" id="simbar" role="status">Training mode: simulated sensor. No hardware is connected and nothing shown is a real measurement.</div>
+
 <div class="unsupported hidden" id="unsupported">
-  <div class="notice err">This browser can't open serial ports. Use Google Chrome or Microsoft Edge on a desktop computer, and load the page over https:// (GitHub Pages works) or from localhost.</div>
+  <div class="notice err">This browser can't open serial ports, so it can't connect to a real sensor. Use Google Chrome or Microsoft Edge on a desktop computer, loaded over https:// (GitHub Pages works) or from localhost. You can still practice with a simulated sensor.</div>
 </div>
 
 <main>
@@ -180,6 +186,15 @@ textarea{resize:vertical;font:inherit}
       <div class="btnrow">
         <button class="btn primary" id="btnConnect">Connect &amp; find sensor</button>
         <button class="btn hidden" id="btnDisconnect">Disconnect</button>
+      </div>
+
+      <div id="demoBox">
+        <h3>Training</h3>
+        <p class="small muted" style="margin:0 0 8px">Practice with a simulated sensor. No hardware needed.</p>
+        <div class="grid2">
+          <select id="demoModel" aria-label="Simulated sensor model"></select>
+          <button class="btn" id="btnDemo">Use simulated sensor</button>
+        </div>
       </div>
 
       <div id="scanBox" class="hidden">
@@ -311,6 +326,12 @@ textarea{resize:vertical;font:inherit}
 
   <!-- ================= Right column ================= -->
   <div class="stack">
+    <section id="secDemo" class="simcard hidden">
+      <h2>The simulated sensor is in</h2>
+      <div class="media" id="demoMedia"></div>
+      <p class="small muted" style="margin:10px 0 0">Readings move toward the new value with realistic settling time and noise. The simulated sensor starts slightly out of calibration, so a calibration will visibly correct it.</p>
+    </section>
+
     <section class="readout">
       <div class="bar">
         <h2 id="readTitle">Live readings</h2>
@@ -757,7 +778,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 /* =====================================================================
    Common registers (identical across these Yosemitech manuals)
    ===================================================================== */
-const TOOL_VERSION = "1.3.0";
+const TOOL_VERSION = "1.4.0";
 const LOGO_DATA = "data:image/jpeg;base64,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", LOGO_W = 460, LOGO_H = 133;
 const REG = { ADDRESS:0x3000, VERSION:0x0700, SERIAL:0x0900, USERCAL:0x1100 };
 const BROADCAST = 0xFF;
@@ -1049,11 +1070,197 @@ const MODELS = [
 ];
 
 /* =====================================================================
+   Training mode: simulated sensors
+   A SimSensor is an in-page Modbus RTU slave with the same register map
+   as the real model. It plugs in where a Web Serial port would, so every
+   frame still goes through the same Modbus code, CRC checks and traffic log.
+   Each simulated sensor starts slightly out of calibration so trainees can
+   see a calibration correct it.
+   ===================================================================== */
+const SIM = {
+  Y521: { prefix:"YL09", tau:5, noise:v => 0.0004 * Math.abs(v) + 0.0002, gain:0.962, off:0.003, start:"tap",
+    media:[ {id:"air", label:"Air", v:0, t:22.0}, {id:"di", label:"Deionized water", v:0.002, t:21.5},
+            {id:"tap", label:"Tap water", v:0.45, t:20.5}, {id:"s1", label:"1.4083 mS/cm standard", v:1.4083, t:24.6},
+            {id:"s2", label:"12.852 mS/cm standard", v:12.852, t:24.8}, {id:"sea", label:"Seawater", v:53, t:18.0} ] },
+  Y504: { prefix:"YL15", tau:9, noise:() => 0.0007, gain:0.955, off:0.012, start:"lake",
+    media:[ {id:"aer", label:"Aerated water (100%)", v:1, t:21.0}, {id:"air", label:"Moist air", v:1, t:22.5},
+            {id:"zero", label:"Zero-oxygen solution (0%)", v:0, t:21.5}, {id:"lake", label:"Lake water", v:0.88, t:17.0} ] },
+  Y511: { prefix:"YL29", tau:4, noise:v => 0.0005 * Math.abs(v) + 0.03, gain:1.05, off:0.6, start:"tap",
+    media:[ {id:"di", label:"Deionized water (0 NTU)", v:0, t:21.0}, {id:"tap", label:"Tap water", v:0.4, t:20.0},
+            {id:"s460", label:"460 NTU standard", v:460, t:22.0}, {id:"river", label:"River water", v:38, t:16.0} ] },
+  Y517: { prefix:"YL12", tau:5, noise:v => 0.0006 * Math.abs(v) + 0.04, gain:0.93, off:1.5, start:"harbor",
+    media:[ {id:"di", label:"Deionized water (0)", v:0, t:21.0}, {id:"std", label:"NDSA standard (100)", v:100, t:22.0},
+            {id:"harbor", label:"Harbor water", v:8, t:15.0} ] },
+  Y532: { prefix:"YL43", tau:10, noise:() => 0.12, slope:56.8, mvOff:9, start:"tap",
+    media:[ {id:"b4", label:"pH 4.00 buffer", v:4.00, t:23.0}, {id:"b686", label:"pH 6.86 buffer", v:6.86, t:23.0},
+            {id:"b918", label:"pH 9.18 buffer", v:9.18, t:23.0}, {id:"tap", label:"Tap water", v:7.6, t:20.0} ] },
+};
+const PH_STD_BUFFERS = [4.00, 4.01, 6.86, 7.00, 9.18, 10.01];
+
+const leF = f => { const dv = new DataView(new ArrayBuffer(4)); dv.setFloat32(0, f, true); return Array.from(new Uint8Array(dv.buffer)); };
+const leR = (d, i) => new DataView(new Uint8Array(d.slice(i, i + 4)).buffer).getFloat32(0, true);
+const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+const doSat = T => 14.652 - 0.41022*T + 0.007991*T*T - 0.000077774*T*T*T;   // mg/L at 101.325 kPa, fresh water
+
+class SimSensor {
+  constructor(id){
+    this.id = id; this.cfg = SIM[id]; this.addr = 1;
+    this.sn = this.cfg.prefix + "SIM" + String(Math.floor(Math.random() * 1e5)).padStart(5, "0");
+    this.K = 1; this.B = 0; this.TK = 1; this.TB = 0;
+    this.cap = [0.9132, 0.01247, -0.000113, 0.0000021, 62.41, 25.0, 0.0118, 0.00009];
+    this.sal = 0; this.press = 101.325; this.brushInt = 30; this.brushBoot = 1;
+    this.phDefault = [6.86, -6.72, 0.04, 6.86, -6.56, -1.04]; this.phK = this.phDefault.slice();
+    this.phFit = null; this.phPts = []; this.phBad = false; this.status = 2;
+    this.target = this.medium(this.cfg.start); this.v = this.target.v; this.t = this.target.t; this.last = performance.now();
+  }
+  medium(id){ return this.cfg.media.find(m => m.id === id); }
+  setMedium(id){ this.step(); this.target = this.medium(id); }
+  step(){
+    const now = performance.now(), dt = (now - this.last) / 1000; this.last = now;
+    this.v += (this.target.v - this.v) * (1 - Math.exp(-dt / this.cfg.tau));
+    this.t += (this.target.t - this.t) * (1 - Math.exp(-dt / 20));
+  }
+  temp(){ return this.TK * (this.t + 0.01 * gauss()) + this.TB; }
+  reported(){ return this.K * (this.cfg.gain * this.v + this.cfg.off + this.cfg.noise(this.v) * gauss()) + this.B; }
+  mv(noise = true){ return (7 - this.v) * this.cfg.slope + this.cfg.mvOff + (noise ? this.cfg.noise() * gauss() : 0); }
+  phFrom(mv){ return this.phFit ? this.phFit.a + mv / this.phFit.b : 7 - mv / 59.16; }
+
+  read(reg){
+    const id = this.id;
+    switch (reg){
+      case 0x3000: return [this.addr, 0];
+      case 0x0700: return [1, 1, 4, 2];
+      case 0x0900: return [0, ...Array.from(this.sn, c => c.charCodeAt(0)), 0];
+      case 0x1100: return [...leF(this.K), ...leF(this.B)];
+    }
+    if (id === "Y521"){
+      if (reg === 0x2000) return [...leF(this.TK), ...leF(this.TB)];
+      if (reg === 0x2600){ const ct = this.reported(); return [...leF(this.temp()), ...leF(ct), ...leF(ct * 640), ...leF(ct * 0.58)]; }
+    }
+    if (id === "Y504"){
+      if (reg === 0x2000) return [...leF(this.TK), ...leF(this.TB)];
+      if (reg === 0x2700) return this.cap.flatMap(leF);
+      if (reg === 0x1500) return leF(this.sal);
+      if (reg === 0x2400) return leF(this.press);
+      if (reg === 0x2600){
+        const T = this.temp(), frac = this.reported();
+        const mg = frac * doSat(T) * (this.press / 101.325) * (1 - 0.0055 * this.sal);
+        return [...leF(T), ...leF(frac), ...leF(mg)];
+      }
+    }
+    if (id === "Y511" || id === "Y517"){
+      if (reg === 0x3200) return [this.brushInt & 0xFF, this.brushInt >> 8];
+      if (reg === 0x1B00) return [this.brushBoot, 0];
+      if (reg === 0x2600) return [...leF(this.temp()), ...leF(this.reported())];
+    }
+    if (id === "Y532"){
+      if (reg === 0x2600){ const mv = this.mv(); return [...leF(mv), ...leF(this.phFrom(mv))]; }
+      if (reg === 0x2400) return leF(this.temp());
+      if (reg === 0x2900) return this.phK.flatMap(leF);
+      if (reg === 0x0E00) return [this.status, 0];
+    }
+    return null;
+  }
+
+  write(reg, d){
+    const id = this.id;
+    if (reg === 0x3000){ if (d[0] >= 1 && d[0] <= 254) this.addr = d[0]; return true; }
+    if (reg === 0x1100 && d.length >= 8){ this.K = leR(d, 0); this.B = leR(d, 4); return true; }
+    if ((id === "Y521" || id === "Y504") && reg === 0x2000 && d.length >= 8){ this.TK = leR(d, 0); this.TB = leR(d, 4); return true; }
+    if (id === "Y504"){
+      if (reg === 0x2700 && d.length >= 32){ this.cap = [0,1,2,3,4,5,6,7].map(i => leR(d, i * 4)); return true; }
+      if (reg === 0x1500 && d.length >= 4){ this.sal = leR(d, 0); return true; }
+      if (reg === 0x2400 && d.length >= 4){ this.press = leR(d, 0); return true; }
+    }
+    if (id === "Y511" || id === "Y517"){
+      if (reg === 0x3100) return true;
+      if (reg === 0x3200 && d.length >= 2){ this.brushInt = d[0] | (d[1] << 8); return true; }
+      if (reg === 0x1B00 && d.length >= 2){ this.brushBoot = d[0] ? 1 : 0; return true; }
+    }
+    if (id === "Y532"){
+      if (reg === 0x2300 && d.length >= 4){
+        if (this.phPts.length >= 3){ this.phPts = []; this.phBad = false; }
+        const ph = leR(d, 0);
+        if (!PH_STD_BUFFERS.some(b => Math.abs(b - ph) < 0.05)) this.phBad = true;
+        this.phPts.push({ph, mv: this.mv(false)});
+        if (this.phPts.length < 3){ this.status = 2; return true; }
+        // least-squares line through the three points: mV = b·(pH − a)
+        const n = 3, xs = this.phPts.map(p => p.ph), ys = this.phPts.map(p => p.mv);
+        const mx = xs.reduce((a, c) => a + c) / n, my = ys.reduce((a, c) => a + c) / n;
+        const b = xs.reduce((a, x, i) => a + (x - mx) * (ys[i] - my), 0) / xs.reduce((a, x) => a + (x - mx) ** 2, 0);
+        const a = mx - my / b;
+        if (this.phBad) this.status = 1;
+        else if (!(b < -45 && b > -65)) this.status = 4;
+        else { this.status = 0; this.phFit = {a, b}; this.phK = [a, b, 0.04, a, b, -1.04]; }
+        return true;
+      }
+      if (reg === 0x2900 && d.length >= 24){
+        this.phK = [0,1,2,3,4,5].map(i => leR(d, i * 4));
+        const isDefault = this.phK.every((k, i) => Math.abs(k - this.phDefault[i]) < 1e-4);
+        this.phFit = isDefault ? null : {a: this.phK[0], b: this.phK[1]};
+        return true;
+      }
+    }
+    return false;
+  }
+
+  handle(frame){
+    if (frame.length < 8 || !crcOk(frame)) return null;
+    const a = frame[0], fn = frame[1], reg = (frame[2] << 8) | frame[3], n = frame[5];
+    if (a !== this.addr && a !== 0xFF) return null;
+    this.step();
+    const ex = code => withCrc([this.addr, fn | 0x80, code]);
+    if (fn === 0x03){
+      const d = this.read(reg); if (!d) return ex(2);
+      const out = d.slice(0, n * 2); while (out.length < n * 2) out.push(0);
+      return withCrc([this.addr, 0x03, n * 2, ...out]);
+    }
+    if (fn === 0x10){
+      const old = this.addr, data = frame.slice(7, 7 + frame[6]);
+      if (!this.write(reg, data)) return ex(2);
+      return withCrc([old, 0x10, frame[2], frame[3], 0, n]);
+    }
+    return ex(1);
+  }
+
+  // Looks like a Web Serial port to ModbusRTU.
+  port(){
+    const sim = this; let ctrl = null;
+    return {
+      simulated: true, readable: null, writable: null,
+      getInfo: () => ({}),
+      async open(){
+        this.readable = new ReadableStream({ start(c){ ctrl = c; } });
+        this.writable = new WritableStream({ write(chunk){
+          const r = sim.handle(Array.from(chunk));
+          if (r) setTimeout(() => { try { ctrl.enqueue(r); } catch {} }, 12 + Math.random() * 25);
+        }});
+      },
+      async close(){ try { ctrl.close(); } catch {} this.readable = null; this.writable = null; },
+    };
+  }
+}
+let sim = null;
+const mediaLabel = m => sim && sim.id === "Y517" ? m.label.replace(/\((\d+)\)/, `($1 ${settings.oiwUnit})`) : m.label;
+
+function renderDemo(){
+  const box = $("demoMedia");
+  if (!sim){ box.innerHTML = ""; return; }
+  box.innerHTML = sim.cfg.media.map(m => `<button class="btn media-btn${sim.target.id === m.id ? " on" : ""}" data-med="${m.id}" aria-pressed="${sim.target.id === m.id}">${esc(mediaLabel(m))}</button>`).join("");
+  box.querySelectorAll("[data-med]").forEach(b => b.onclick = () => {
+    sim.setMedium(b.dataset.med);
+    log("···", `simulated sensor moved to: ${mediaLabel(sim.target)}`);
+    renderDemo();
+    if (!st.polling && prof()) startPoll();
+  });
+}
+
+/* =====================================================================
    App state
    ===================================================================== */
 const mb = new ModbusRTU();
 const st = {
-  connected:false, addr:null, sn:null, hw:null, sw:null, type:null, model:null, comp:null,
+  connected:false, demo:false, addr:null, sn:null, hw:null, sw:null, type:null, model:null, comp:null,
   blocks:{}, polling:false, pollTimer:null, scanning:false,
   hist:{}, last:null, rec:[], listeners:new Set(),
 };
@@ -1063,6 +1270,9 @@ if (!("serial" in navigator)){
   $("btnConnect").disabled = true;
 }
 
+$("demoModel").innerHTML = Object.entries(PROFILES).map(([id, p]) => `<option value="${id}">${p.model} ${p.title.toLowerCase()}</option>`).join("");
+const fileTag = () => st.demo ? "SIM_" : "";
+
 $("sensorType").innerHTML = `<option value="">Choose…</option>` +
   Object.entries(PROFILES).map(([id, p]) => `<option value="${id}">${p.model} ${p.title.toLowerCase()}</option>`).join("");
 
@@ -1070,7 +1280,7 @@ function setHeader(){
   const p = prof();
   $("hdrDot").className = "dot" + (st.connected ? (st.addr ? " on" : " busy") : "");
   $("hdrStatus").textContent = !st.connected ? "Not connected"
-    : st.addr ? `${p ? p.model + " " : st.model ? st.model + " " : "Sensor "}at address ${st.addr}, ${mb.baud} baud` + (st.sn ? ` (SN ${st.sn})` : "")
+    : st.addr ? `${p ? p.model + " " : st.model ? st.model + " " : "Sensor "}${st.demo ? "(simulated) " : ""}at address ${st.addr}, ${mb.baud} baud` + (st.sn ? ` (SN ${st.sn})` : "")
     : `Port open at ${mb.baud} baud, no sensor yet`;
   $("hdrSub").textContent = p ? `Yosemitech ${p.model} ${p.title.toLowerCase()} sensor` : "Yosemitech RS-485 water quality sensors";
 }
@@ -1080,6 +1290,9 @@ function setConnectedUI(){
   $("btnConnect").classList.toggle("hidden", st.connected);
   $("btnDisconnect").classList.toggle("hidden", !st.connected);
   $("scanBox").classList.toggle("hidden", !st.connected);
+  $("demoBox").classList.toggle("hidden", st.connected);
+  $("simbar").classList.toggle("hidden", !st.demo);
+  $("secDemo").classList.toggle("hidden", !st.demo);
   const have = st.connected && st.addr;
   $("secDevice").classList.toggle("hidden", !have);
   $("secCalVals").classList.toggle("hidden", !(have && p));
@@ -1123,13 +1336,27 @@ $("btnConnect").onclick = async () => {
   }
 };
 
+$("btnDemo").onclick = async () => {
+  try {
+    sim = new SimSensor($("demoModel").value);
+    mb.port = sim.port();
+    await mb.open(+$("baud").value);
+    st.connected = true; st.demo = true;
+    $("dPort").textContent = "Simulated (training)";
+    log("···", `simulated ${PROFILES[sim.id].model} connected (training mode); nothing here is a real measurement`);
+    renderDemo(); setConnectedUI();
+    scan();
+  } catch (e) { sim = null; alert("Couldn't start the simulated sensor: " + e.message); }
+};
+
 $("btnDisconnect").onclick = disconnect;
 async function disconnect(){
   stopPoll();
   st.scanning = false;
   await mb.close();
-  log("···", "port closed");
-  Object.assign(st, {connected:false, addr:null, sn:null, hw:null, sw:null, type:null, model:null, comp:null, blocks:{}, last:null});
+  log("···", st.demo ? "simulated sensor disconnected" : "port closed");
+  mb.port = null; sim = null; renderDemo();
+  Object.assign(st, {connected:false, demo:false, addr:null, sn:null, hw:null, sw:null, type:null, model:null, comp:null, blocks:{}, last:null});
   $("sensorType").value = ""; notice("typeMsg", "", "");
   applyProfile(null, true);
   setConnectedUI();
@@ -1364,10 +1591,10 @@ function backup(){
   const p = prof();
   const groups = {};
   for (const k of p.blocks){ const v = st.blocks[k]; groups[k] = {register:"0x" + BLOCKS[k].reg.toString(16).toUpperCase(), ...(v ? Object.fromEntries(BLOCKS[k].names.map((n, i) => [n, v[i]])) : {})}; }
-  const data = {saved:new Date().toISOString(), model:p.model, serial:st.sn, address:st.addr, baud:mb.baud, hardware:st.hw, software:st.sw, calibration:groups};
+  const data = {simulated: !!st.demo, saved:new Date().toISOString(), model:p.model, serial:st.sn, address:st.addr, baud:mb.baud, hardware:st.hw, software:st.sw, calibration:groups};
   if (p.comp) data.compensation = {salinity_ppt: parseFloat($("compSal").value), air_pressure_kPa: parseFloat($("compP").value)};
   if (p.brush) data.brush = {interval_min: parseInt($("brushInt").value), run_on_power_up: $("brushBoot").value === "1"};
-  download(`${p.model}_${st.sn || "sensor"}_cal_${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(data, null, 2), "application/json");
+  download(`${fileTag()}${p.model}_${st.sn || "sensor"}_cal_${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(data, null, 2), "application/json");
   cal.backedUp = true; renderCal();
 }
 $("btnBackup").onclick = backup;
@@ -1511,7 +1738,7 @@ $("btnCSV").onclick = () => {
   const col = k => `${p.fields[k].name}${p.fields[k].unit() ? " (" + p.fields[k].unit() + ")" : ""}`;
   const rows = [["timestamp", ...p.order.map(col)].map(s => `"${s}"`).join(",")];
   for (const m of st.rec) rows.push([m.time.toISOString(), ...p.order.map(k => fdisp(k, m[k]))].join(","));
-  download(`${p.model}_${st.sn || "sensor"}_${new Date().toISOString().replace(/[:.]/g,"-")}.csv`, rows.join("\n"), "text/csv");
+  download(`${fileTag()}${p.model}_${st.sn || "sensor"}_${new Date().toISOString().replace(/[:.]/g,"-")}.csv`, rows.join("\n"), "text/csv");
 };
 $("recCSV").onchange = () => { if ($("recCSV").checked && st.rec.length === 0) $("recCount").textContent = "0 rows"; };
 
@@ -1520,7 +1747,7 @@ $("recCSV").onchange = () => { if ($("recCSV").checked && st.rec.length === 0) $
    ===================================================================== */
 $("unit").onchange = () => { settings.unit = $("unit").value; refreshGauges(); renderCal(); };
 $("doFmt").onchange = () => { settings.doFmt = $("doFmt").value; refreshGauges(); renderCal(); };
-$("oiwUnit").onchange = () => { settings.oiwUnit = $("oiwUnit").value; refreshGauges(); renderCal(); };
+$("oiwUnit").onchange = () => { settings.oiwUnit = $("oiwUnit").value; refreshGauges(); renderCal(); renderDemo(); };
 $("order").onchange = () => { settings.order = $("order").value; if (st.addr && prof()) readCal(); };
 
 /* =====================================================================
@@ -2016,7 +2243,7 @@ function blocksOut(src){
 
 function buildReportData(){
   const p = prof(), ph = isPhCal(), now = new Date(), EU = entryUnit();
-  const id = `${p.model}_${(st.sn || "NOSN").replace(/[^A-Za-z0-9-]/g, "")}_${stamp(now)}`;
+  const id = `${fileTag()}${p.model}_${(st.sn || "NOSN").replace(/[^A-Za-z0-9-]/g, "")}_${stamp(now)}`;
   const series = cp => cp.series.map(x => [+x.t.toFixed(1), ph ? x.m.mv : fromS(x.m[p.cal.field])]);
   const points = cal.caps.filter(Boolean).map((cp, i) => ph ? {
       point: i + 1, buffer_pH: cp.std, mV_mean: cp.stats.mean, mV_sd: cp.stats.sd, mV_min: cp.stats.min, mV_max: cp.stats.max,
@@ -2044,6 +2271,7 @@ function buildReportData(){
   if (p.comp && st.comp){ conditions.salinity_ppt = st.comp.sal; conditions.air_pressure_kPa = st.comp.p; conditions.do_saturation_reported_as = settings.doFmt; }
   if (p.brush) conditions.brush_runs_during_calibration = cal.brushRuns;
   return {
+    simulated: !!st.demo,
     report_id: id, generated: now, time_zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     tool: `Freeboard Sensor Utility ${TOOL_VERSION}`,
     sensor: {model: p.model, serial: st.sn, hardware: st.hw, software: st.sw, modbus_address: st.addr, baud: mb.baud},
@@ -2180,6 +2408,7 @@ function buildPdf(rep){
   doc.setFillColor(...(good ? [240,247,234] : [251,244,232])); doc.setDrawColor(...(good ? [111,174,62] : [214,150,0]));
   doc.setLineWidth(0.4); doc.roundedRect(M, y - 4, CW, 13, 1.5, 1.5, "FD");
   set(10, "bold", INK); T(outcome, M + 4, y + 1.2);
+  if (d.simulated){ set(9, "bold", BAD); T("SIMULATED SENSOR - TRAINING ONLY", W - M - 4, y + 1.2, {align:"right"}); }
   set(8.8, "normal", INK); T(vsum, M + 4, y + 6.2);
   y += 15;
 
@@ -2274,6 +2503,12 @@ function buildPdf(rep){
     set(7.2, "normal", MUTED);
     T(`Freeboard Technology  |  ${d.tool}  |  ${d.report_id}`, M, H - 11);
     T(`Page ${i} of ${pages}`, W - M, H - 11, {align:"right"});
+    if (d.simulated){
+      doc.saveGraphicsState(); doc.setGState(new doc.GState({opacity:0.13}));
+      set(34, "bold", BAD);
+      doc.text("TRAINING - NOT A REAL CALIBRATION", M + 10, H - 40, {angle:50});
+      doc.restoreGraphicsState();
+    }
     if (rep.hash){ doc.setFont("courier", "normal"); doc.setFontSize(6.6); T(`Data file SHA-256: ${rep.hash}`, M, H - 7.5); }
   }
   return doc;
